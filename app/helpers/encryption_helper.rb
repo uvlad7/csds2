@@ -4,7 +4,8 @@ module EncryptionHelper
   AES = 'AES-256-CFB'
 
   def encrypt(key, text)
-    key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
+    key = Digest::SHA256.hexdigest(key) if (key.kind_of?(String) && 32 != key.bytesize)
+    p key.bytes
     aes = OpenSSL::Cipher.new(AES)
     aes.encrypt
     iv = aes.random_iv
@@ -13,7 +14,8 @@ module EncryptionHelper
   end
 
   def decrypt(key, data)
-    key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
+    key = Digest::SHA256.hexdigest(key) if (key.kind_of?(String) && 32 != key.bytesize)
+    p key.bytes
     aes = OpenSSL::Cipher.new(AES)
     aes.decrypt
     bytes = data.bytes
@@ -24,7 +26,7 @@ module EncryptionHelper
   end
 
   def random_key_32
-    SecureRandom.random_bytes(32)
+    SecureRandom.hex(16).force_encoding('UTF-8')
   end
 
   def self.rsa_encrypt(key, data)
