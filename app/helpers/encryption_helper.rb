@@ -22,7 +22,8 @@ module EncryptionHelper
   end
 
   def self.rsa_encrypt(key, data)
-    public_key = OpenSSL::PKey::RSA.new(key)
+    public_key = OpenSSL::PKey::RSA.new
+    public_key.set_key(key[:n], key[:e], key[:d])
     Base64.encode64(public_key.public_encrypt(data))
   end
 end
