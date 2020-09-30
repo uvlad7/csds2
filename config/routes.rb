@@ -8,13 +8,6 @@ Rails.application.routes.draw do
                        sessions: 'users/sessions',
                        registrations: 'users/registrations',
                      }
-  post 'files/show'
 
-  post 'files/update'
-
-  post 'files/delete'
-
-  post 'files/create'
-
-  post 'files/index'
+  resources :files, except: :new
 end

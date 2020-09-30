@@ -11,7 +11,7 @@ class FilesController < ApplicationController
     file
   end
 
-  def delete
+  def destroy
     file = NotepadFile.where("user_id = #{current_user.id} and name = #{params[:filename]}").destroy
   end
 
