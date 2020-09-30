@@ -1,9 +1,11 @@
 require 'digest'
 
 module EncryptionHelper
+  AES = 'AES-256-OFB'
+
   def encrypt(key, data)
     key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    aes = OpenSSL::Cipher.new('IDEA-256-OFB')
+    aes = OpenSSL::Cipher.new(AES)
     aes.encrypt
     aes.key = key
     aes.update(data) + aes.final
@@ -11,9 +13,9 @@ module EncryptionHelper
 
   def decrypt(key, data)
     key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    aes = OpenSSL::Cipher.new('IDEA-256-OFB')
+    aes = OpenSSL::Cipher.new(AES)
     aes.decrypt
-    aes.key = Digest::SHA256.digest(key)
+    aes.key = key
     aes.update(data) + aes.final
   end
 
