@@ -1,10 +1,11 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  include EncryptionHelper
   respond_to :json
 
   def create
     super do |resource|
       resource.update_attribute(:rsa_pub, params[:rsa_pub])
-      resource.update_attribute(:session_key, random_key_32)
+      resource.update_attribute(:session_key, Base64.encode64(random_key_32))
     end
   end
 

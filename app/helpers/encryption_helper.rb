@@ -1,7 +1,7 @@
 require 'digest'
 
 module EncryptionHelper
-  def idea_encrypt(key, data)
+  def encrypt(key, data)
     key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
     aes = OpenSSL::Cipher.new('IDEA-256-OFB')
     aes.encrypt
@@ -9,7 +9,7 @@ module EncryptionHelper
     aes.update(data) + aes.final
   end
 
-  def idea_decrypt(key, data)
+  def decrypt(key, data)
     key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
     aes = OpenSSL::Cipher.new('IDEA-256-OFB')
     aes.decrypt
@@ -21,7 +21,7 @@ module EncryptionHelper
     SecureRandom.random_bytes(32)
   end
 
-  def rsa_encrypt(key, data)
+  def self.rsa_encrypt(key, data)
     public_key = OpenSSL::PKey::RSA.new(key)
     Base64.encode64(public_key.public_encrypt(data))
   end

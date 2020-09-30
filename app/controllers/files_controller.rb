@@ -7,7 +7,7 @@ class FilesController < ApplicationController
 
   def update
     file = NotepadFile.where("user_id = #{current_user.id} and name = #{params[:filename]}")
-    file.update(name: params[:new_filename].present? ? params[:new_filename] : params[:filename], text: decrypt(user.session_key, params[:text]))
+    file.update(name: params[:new_filename].present? ? params[:new_filename] : params[:filename], text: decrypt(Base64.decode64(user.session_key), params[:text]))
     file
   end
 
@@ -16,7 +16,7 @@ class FilesController < ApplicationController
   end
 
   def create
-    NotepadFile.create(name: params[:filename], text: decrypt(user.session_key, params[:text]))
+    NotepadFile.create(name: params[:filename], text: decrypt(Base64.decode64(user.session_key), params[:text]))
   end
 
   def index
