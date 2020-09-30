@@ -2,24 +2,27 @@ class FilesController < ApplicationController
   before_action :authenticate_user!
 
   def show
-    NotepadFile.where("user_id = #{current_user.id} and name = #{params[:filename]}")
+    render json: current_user.files.find(params[:id])
   end
 
   def update
-    file = NotepadFile.where("user_id = #{current_user.id} and name = #{params[:filename]}")
+    file = current_user.files.find(params[:id])
     file.update(name: params[:new_filename].present? ? params[:new_filename] : params[:filename], text: decrypt(Base64.decode64(user.session_key), params[:text]))
-    file
+    render json: file
   end
 
   def destroy
-    file = NotepadFile.where("user_id = #{current_user.id} and name = #{params[:filename]}").destroy
+    current_user.files.find(params[:id]).destroy
+    render json: {
+      status: { code: 204, message: 'Deleted successfully.' },
+    }
   end
 
   def create
-    NotepadFile.create(name: params[:filename], text: decrypt(Base64.decode64(user.session_key), params[:text]))
+    render json: NotepadFile.create(name: params[:filename], text: decrypt(Base64.decode64(user.session_key), params[:text]))
   end
 
   def index
-    current_user.notepad_files.map { |f| f.name }
+    render json: current_user.notepad_files.pluck(:name)
   end
 end
