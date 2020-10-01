@@ -1,28 +1,33 @@
 require 'digest'
 
 module EncryptionHelper
-  AES = 'AES-256-CFB'
-
   def encrypt(key, text)
     key = Digest::SHA256.hexdigest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    p key.bytes
-    aes = OpenSSL::Cipher.new(AES)
-    aes.encrypt
-    iv = aes.random_iv
-    aes.key = key
-    (iv + aes.update(text) + aes.final).force_encoding('UTF-8')
+    crypt = Chilkat::CkCrypt2.new
+    crypt.put_CryptAlgorithm('aes')
+    crypt.put_CipherMode('cfb')
+    crypt.put_KeyLength(256)
+    crypt.put_PaddingScheme(0)
+    crypt.put_EncodingMode('hex')
+    iv = SecureRandom.hex(8)
+    crypt.SetEncodedIV(iv, 'hex')
+    crypt.SetEncodedKey(key, 'hex')
+    data = (iv + crypt.encryptStringENC(text)).force_encoding('UTF-8')
   end
 
   def decrypt(key, data)
     key = Digest::SHA256.hexdigest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    p key.bytes
-    aes = OpenSSL::Cipher.new(AES)
-    aes.decrypt
+    crypt = Chilkat::CkCrypt2.new
+    crypt.put_CryptAlgorithm('aes')
+    crypt.put_CipherMode('cfb')
+    crypt.put_KeyLength(256)
+    crypt.put_PaddingScheme(0)
+    crypt.put_EncodingMode('hex')
     bytes = data.bytes
     iv, text = [bytes[0...16], bytes[16..-1]].map { |arr| arr.pack('c*') }
-    aes.iv = iv
-    aes.key = key
-    (aes.update(text) + aes.final).force_encoding('UTF-8')
+    crypt.SetEncodedIV(iv, 'hex')
+    crypt.SetEncodedKey(key, 'hex')
+    crypt.decryptStringENC(text).force_encoding('UTF-8')
   end
 
   def random_key_32
