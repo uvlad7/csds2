@@ -1,30 +1,20 @@
 require 'digest'
 
 module EncryptionHelper
-  AES = 'AES-256-CFB'
-
   def encrypt(key, text)
-    key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    aes = OpenSSL::Cipher.new(AES)
-    aes.encrypt
-    iv = aes.random_iv
-    aes.key = key
-    (iv + aes.update(text) + aes.final).force_encoding('UTF-8')
+    t = NodeTask.new './lib/tasks/encrypt.js'
+    result = t.run "#{key} #{text}"
+    result[:result]
   end
 
   def decrypt(key, data)
-    key = Digest::SHA256.digest(key) if (key.kind_of?(String) && 32 != key.bytesize)
-    aes = OpenSSL::Cipher.new(AES)
-    aes.decrypt
-    bytes = data.bytes
-    iv, text = [bytes[0...16], bytes[16..-1]].map { |arr| arr.pack('c*') }
-    aes.iv = iv
-    aes.key = key
-    (aes.update(text) + aes.final).force_encoding('UTF-8')
+    t = NodeTask.new './lib/tasks/decrypt.js'
+    result = t.run "#{key} #{data}"
+    result[:result]
   end
 
   def random_key_32
-    SecureRandom.random_bytes(32)
+    SecureRandom.hex(16).force_encoding('UTF-8')
   end
 
   def self.rsa_encrypt(key, data)
