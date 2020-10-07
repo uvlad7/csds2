@@ -24,6 +24,6 @@ class FilesController < ApplicationController
   end
 
   def index
-    render json: current_user.notepad_files.pluck(:name)
+    render json: {data: current_user.notepad_files.pluck(:name, :id)}
   end
 end
