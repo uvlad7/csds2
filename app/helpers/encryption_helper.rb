@@ -7,7 +7,19 @@ module EncryptionHelper
     result[:result]
   end
 
+  def self.encrypt(key, text)
+    t = NodeTask.new './lib/tasks/encrypt.js'
+    result = t.run "#{key} #{text}"
+    result[:result]
+  end
+
   def decrypt(key, data)
+    t = NodeTask.new './lib/tasks/decrypt.js'
+    result = t.run "#{key} #{data}"
+    result[:result]
+  end
+
+  def self.decrypt(key, data)
     t = NodeTask.new './lib/tasks/decrypt.js'
     result = t.run "#{key} #{data}"
     result[:result]
